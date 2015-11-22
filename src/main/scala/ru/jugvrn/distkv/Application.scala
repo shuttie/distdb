@@ -45,8 +45,6 @@ object Application {
             master.ask(Put(data)).mapTo[String]
           }
         }
-      } ~ delete {
-        com
       }
     }
 
