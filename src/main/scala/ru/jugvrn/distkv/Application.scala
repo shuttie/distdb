@@ -24,15 +24,7 @@ object Application {
     implicit val mat = ActorMaterializer()
     implicit val timeout = Timeout(1.second)
 
-    val worker = system.actorOf(Props(classOf[Slave]), name = "worker")
-
-    system.actorOf(ClusterSingletonManager.props(
-      singletonProps = Props(classOf[Master]),
-      terminationMessage = PoisonPill,
-      settings = ClusterSingletonManagerSettings(system)),
-      name = "master")
-
-    val master = Node.masterFor(system)
+    val worker = system.actorOf(Props(classOf[Master]), name = "master")
 
     val route = path("db") {
       get {
@@ -42,11 +34,9 @@ object Application {
       } ~ put {
         entity(as[String]) { data =>
           complete {
-            master.ask(Put(data)).mapTo[String]
+            worker.ask(Put(data)).mapTo[String]
           }
         }
-      } ~ delete {
-        com
       }
     }
 
