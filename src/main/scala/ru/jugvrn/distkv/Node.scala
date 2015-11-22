@@ -1,35 +1,33 @@
 package ru.jugvrn.distkv
 
-import java.io.File
-import akka.actor.{Actor, ActorLogging}
-import akka.cluster.pubsub.DistributedPubSubMediator.{SubscribeAck, Subscribe}
+import akka.actor._
 import akka.cluster.pubsub.DistributedPubSub
-import org.mapdb.DBMaker
-import ru.jugvrn.distkv.Application.{Get, Put}
+import akka.cluster.singleton._
+import better.files._
 
 /**
-  * Created by shutty on 11/16/15.
+  * Created by shutty on 11/21/15.
   */
+trait Node extends Actor with ActorLogging {
+  val master = Node.masterFor(context.system)
 
-class Node extends Actor with ActorLogging {
-  val db = DBMaker.newFileDB(new File("/tmp/db.dat")).closeOnJvmShutdown().make()
-  val data = db.getHashMap[String,String]("data")
+  val broadcast = DistributedPubSub(context.system).mediator
 
-  val mediator = DistributedPubSub(context.system).mediator
-  mediator ! Subscribe("data", self)
 
-  def receive = {
-    case SubscribeAck(Subscribe(topic, _, _)) =>
-      log.info(s"worker subscribed to $topic")
-
-    case Put(k, v) =>
-      data.put(k, v)
-      db.commit()
-      log.info(s"stored ($k, $v)")
-
-    case Get(k) =>
-      val result = Option(data.get(k)).getOrElse("<empty>")
-      sender() ! result
-      log.info(s"read ($k, $result)")
+  def write(fileName:String, data:String) = {
+    val file = File(fileName)
+    file.overwrite(data)
   }
+
+  def read(fileName:String) = {
+    val file = File(fileName)
+    if (file.exists) file.contentAsString else "<empty>"
+  }
+}
+
+object Node {
+  def masterFor(system:ActorSystem) = system.actorOf(ClusterSingletonProxy.props(
+    singletonManagerPath = "/user/master",
+    settings = ClusterSingletonProxySettings(system)))
+
 }

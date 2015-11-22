@@ -1,8 +1,9 @@
 package ru.jugvrn.distkv
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{PoisonPill, Props, ActorSystem}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
+import akka.cluster.singleton.{ClusterSingletonManagerSettings, ClusterSingletonManager}
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
@@ -15,41 +16,39 @@ import scala.concurrent.duration._
   */
 object Application {
 
-  case class Get(key:String)
-  case class Put(key:String, value:String)
+  case object Get
+  case class Put(value:String)
 
   def main(args: Array[String]) {
     implicit val system = ActorSystem.create("distkv")
     implicit val mat = ActorMaterializer()
     implicit val timeout = Timeout(1.second)
 
-    val worker = system.actorOf(Props(classOf[Node]), name = "worker")
-    val mediator = DistributedPubSub(system).mediator
+    val worker = system.actorOf(Props(classOf[Slave]), name = "worker")
 
+    system.actorOf(ClusterSingletonManager.props(
+      singletonProps = Props(classOf[Master]),
+      terminationMessage = PoisonPill,
+      settings = ClusterSingletonManagerSettings(system)),
+      name = "master")
 
-    val route = path("db" / Segment) { key =>
+    val master = Node.masterFor(system)
+
+    val route = path("db") {
       get {
         complete {
-          worker.ask(Get(key)).mapTo[String]
+          worker.ask(Get).mapTo[String]
         }
-      } ~
-        put {
-          entity(as[String]) { data =>
-            complete {
-              mediator ! Publish("data", Put(key, data))
-              "ok"
-            }
+      } ~ put {
+        entity(as[String]) { data =>
+          complete {
+            master.ask(Put(data)).mapTo[String]
           }
         }
-    } ~ path("stop") {
-      get {
-        complete {
-          system.terminate()
-          "kansas is going byebye"
-        }
+      } ~ delete {
+        com
       }
     }
-
 
     Http().bindAndHandle(route, "localhost", 8888)
 
