@@ -14,6 +14,4 @@ libraryDependencies += "com.typesafe.akka" %% "akka-http-experimental" % "1.0"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 
-libraryDependencies += "org.mapdb" % "mapdb" % "1.0.8"
-
 libraryDependencies += "com.github.pathikrit" %% "better-files" % "2.13.0"
