@@ -5,13 +5,18 @@ val project = Project(
   id = "distkv",
   base = file("."),
   settings = Project.defaultSettings ++ SbtMultiJvm.multiJvmSettings ++ Seq(
-    name := "akka-sample-multi-node-scala",
+    name := "distkv",
     version := "1.0",
     scalaVersion := "2.11.7",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.4.0",
-      "com.typesafe.akka" %% "akka-remote" % "2.4.0",
-      "com.typesafe.akka" %% "akka-multi-node-testkit" % "2.4.0",
+      "com.typesafe.akka" %% "akka-actor" % "2.4.1",
+      "com.typesafe.akka" %% "akka-remote" % "2.4.1",
+      "com.typesafe.akka" %% "akka-multi-node-testkit" % "2.4.1",
+      "com.typesafe.akka" %% "akka-cluster" % "2.4.1",
+      "com.typesafe.akka" %% "akka-cluster-tools" % "2.4.1",
+      "com.typesafe.akka" %% "akka-http-experimental" % "2.0-M2",
+      "com.typesafe" % "config" % "1.3.0",
+      "com.github.pathikrit" %% "better-files" % "2.13.0",
       "org.scalatest" %% "scalatest" % "2.2.1" % "test"),
     // make sure that MultiJvm test are compiled by the default test compilation
     compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
@@ -32,44 +37,3 @@ val project = Project(
     }
   )
 ) configs (MultiJvm)
-
-
-
-name := "distkv"
-
-version := "1.0"
-
-scalaVersion := "2.11.7"
-
-parallelExecution in Test := false
-
-compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test)
-
-executeTests in Test <<= (executeTests in Test, executeTests in MultiJvm) map {
-  case (testResults, multiNodeResults)  =>
-    val overall =
-      if (testResults.overall.id < multiNodeResults.overall.id)
-        multiNodeResults.overall
-      else
-        testResults.overall
-    Tests.Output(overall,
-      testResults.events ++ multiNodeResults.events,
-      testResults.summaries ++ multiNodeResults.summaries)
-}
-
-unmanagedSourceDirectories in MultiJvm <<=
-  Seq(baseDirectory(_ / "src/test")).join
-
-seq(SbtMultiJvm.multiJvmSettings :_*)
-
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.0"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % "2.4.0"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % "2.4.0"
-
-libraryDependencies += "com.typesafe.akka" %% "akka-http-experimental" % "1.0"
-
-libraryDependencies += "com.typesafe" % "config" % "1.3.0"
-
-libraryDependencies += "com.github.pathikrit" %% "better-files" % "2.13.0"
