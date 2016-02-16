@@ -1,0 +1,5 @@
+jepsen:
+  image: jepsen-node
+  log_driver: syslog
+  dns: 172.17.0.1
+  privileged: true

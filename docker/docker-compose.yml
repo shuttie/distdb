@@ -1,0 +1,48 @@
+n1:
+  container_name: n1
+  hostname: n1
+  environment:
+    - DNSDOCK_ALIAS=n1
+  extends:
+    file: common.yml
+    service: jepsen
+n2:
+  container_name: n2
+  hostname: n2
+  environment:
+    - DNSDOCK_ALIAS=n2
+  extends:
+    file: common.yml
+    service: jepsen
+n3:
+  container_name: n3
+  hostname: n3
+  environment:
+    - DNSDOCK_ALIAS=n3
+  extends:
+    file: common.yml
+    service: jepsen
+n4:
+  container_name: n4
+  hostname: n4
+  environment:
+    - DNSDOCK_ALIAS=n4
+  extends:
+    file: common.yml
+    service: jepsen
+n5:
+  container_name: n5
+  hostname: n5
+  environment:
+    - DNSDOCK_ALIAS=n5
+  extends:
+    file: common.yml
+    service: jepsen
+dnsdock:
+  container_name: dnsdock
+  hostname: dnsdock
+  image: tonistiigi/dnsdock
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  ports:
+    - "172.17.0.1:53:53/udp"
