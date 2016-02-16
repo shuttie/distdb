@@ -1,0 +1,4 @@
+#!/bin/sh
+
+curl -4 -v -XGET http://$1:8000/db
+echo

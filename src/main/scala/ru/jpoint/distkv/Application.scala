@@ -1,7 +1,7 @@
-package ru.jugvrn.distkv
+package ru.jpoint.distkv
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{HttpEntity, HttpMethods, HttpRequest}
+import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
@@ -10,18 +10,15 @@ import scala.concurrent.duration._
 /**
   * Created by shutty on 11/16/15.
   */
-object Application {
-
-  case object Get
-  case class Put(value:String)
+object Application extends Logging {
+  var value:String = "zero"
 
   def main(args: Array[String]) {
+    val conf = Config.parse(args)
+    log.info("Starting distkv")
     implicit val system = ActorSystem.create("distkv")
     implicit val mat = ActorMaterializer()
-
-    val hosts = List("localhost:8881", "localhost:8882", "localhost:8883", "localhost:8884", "localhost:8885")
     val http = Http(system)
-    var value = "<empty>"
 
     val route = path("db") {
       get {
@@ -31,21 +28,19 @@ object Application {
       } ~ post {
         entity(as[String]) { data =>
           complete {
-            hosts.map( host => http.singleRequest(HttpRequest(uri = s"http://$host/db", method = HttpMethods.PUT, entity = HttpEntity(data))))
-            data
-          }
-        }
-      } ~ put {
-        entity(as[String]) { data =>
-          complete {
-            value = data
-            data
+            if (conf.isMaster) {
+              value = data
+              conf.slaves.foreach( host => http.singleRequest(HttpRequest(uri = s"http://$host/db", method = HttpMethods.POST, entity = HttpEntity(data))))
+              HttpResponse(StatusCodes.OK)
+            } else {
+              HttpResponse(StatusCodes.BadRequest)
+            }
           }
         }
       }
     }
 
-    Http().bindAndHandle(route, "localhost", args.head.toInt)
+    Http().bindAndHandle(route, "localhost", 8000)
 
     Await.result(system.whenTerminated, Duration.Inf)
   }

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+curl -4 -v -XPOST http://$1:8000/db -d $2
+echo
