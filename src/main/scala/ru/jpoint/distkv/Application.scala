@@ -15,7 +15,6 @@ object Application extends Logging {
 
   def main(args: Array[String]) {
     val conf = Config.parse(args)
-    log.info("Starting distkv")
     implicit val system = ActorSystem.create("distkv")
     implicit val mat = ActorMaterializer()
     val http = Http(system)
@@ -23,30 +22,31 @@ object Application extends Logging {
     val route = path("db") {
       get {
         complete {
+          log.info(s"read, result=$value")
           value
         }
       } ~ post {
         entity(as[String]) { data =>
           complete {
+            log.info(s"write, before=$value, after=$data")
+            value = data
             if (conf.isMaster) {
-              value = data
+              log.info(s"replicating write to slaves: ${conf.slaves}")
               conf.slaves.foreach( host =>
                 http.singleRequest(HttpRequest(
                   uri = s"http://$host/db",
                   method = HttpMethods.POST,
                   entity = HttpEntity(data))))
 
-              HttpResponse(StatusCodes.OK)
-            } else {
-              HttpResponse(StatusCodes.BadRequest)
             }
+            HttpResponse(StatusCodes.OK)
           }
         }
       }
     }
 
-    Http().bindAndHandle(route, "localhost", 8000)
-
+    Http().bindAndHandle(route, "0.0.0.0", 8000)
+    log.info("Service started")
     Await.result(system.whenTerminated, Duration.Inf)
   }
 }
