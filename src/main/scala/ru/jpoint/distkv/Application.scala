@@ -30,7 +30,12 @@ object Application extends Logging {
           complete {
             if (conf.isMaster) {
               value = data
-              conf.slaves.foreach( host => http.singleRequest(HttpRequest(uri = s"http://$host/db", method = HttpMethods.POST, entity = HttpEntity(data))))
+              conf.slaves.foreach( host =>
+                http.singleRequest(HttpRequest(
+                  uri = s"http://$host/db",
+                  method = HttpMethods.POST,
+                  entity = HttpEntity(data))))
+
               HttpResponse(StatusCodes.OK)
             } else {
               HttpResponse(StatusCodes.BadRequest)
