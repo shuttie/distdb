@@ -1,5 +1,8 @@
-jepsen:
-  image: jepsen-node
+node:
+  image: shutty/distkv
   log_driver: syslog
   dns: 172.17.0.1
   privileged: true
+  environment:
+    MASTER: 'false'
+    SLAVES: n2,n3,n4,n5

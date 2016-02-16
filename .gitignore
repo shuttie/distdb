@@ -2,3 +2,4 @@ project/project
 project/target
 target
 .idea
+docker/distkv-assembly-1.0.jar

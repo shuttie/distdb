@@ -14,7 +14,10 @@ RUN chmod 600 /root/.ssh/authorized_keys
 RUN rm -f /etc/service/sshd/down
 RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 
-RUN apt-get -y -q install curl iptables iputils-ping
+RUN apt-get -y -q install curl iptables iputils-ping inetutils-telnet
+EXPOSE 8000
 RUN mkdir /app
+RUN mkdir /etc/service/distkv
+ADD distkv.sh /etc/service/distkv/run
 ADD distkv-assembly-1.0.jar /app/
 CMD ["/sbin/my_init"]
