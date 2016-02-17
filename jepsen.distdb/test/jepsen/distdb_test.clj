@@ -1,7 +1,13 @@
 (ns jepsen.distdb-test
   (:require [clojure.test :refer :all]
+            [jepsen.core :as jepsen]
             [jepsen.distdb :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest distdb-test
+  (is (:valid?
+        (:results (jepsen/run! (assoc (jepsen.distdb/distsb-test)
+                                 :ssh {
+                                       :strict-host-key-checking false
+                                       :trace true
+                                       :private-key-path "~/.ssh/grebennikov_roman.pem"
+                                       :username "root"}))))))
