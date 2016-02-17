@@ -17,7 +17,7 @@ RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 RUN apt-get -y -q install curl iptables iputils-ping inetutils-telnet dnsutils
 EXPOSE 8000
 RUN mkdir /app
-RUN mkdir /etc/service/distkv
-ADD distkv.sh /etc/service/distkv/run
-ADD distkv-assembly-1.0.jar /app/
+RUN mkdir /etc/service/distdb
+ADD distdb.sh /etc/service/distdb/run
+ADD distdb-assembly-1.0.jar /app/
 CMD ["/sbin/my_init"]

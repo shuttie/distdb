@@ -1,5 +1,5 @@
 node:
-  image: shutty/distkv
+  image: shutty/distdb
   log_driver: syslog
   dns: 172.17.0.1
   privileged: true
