@@ -1,28 +1,30 @@
-package ru.jpoint.distkv
+package ru.jpoint.distdb
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
+import org.slf4j.LoggerFactory
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 /**
   * Created by shutty on 11/16/15.
   */
-object Application extends Logging {
+object App {
+  lazy val log = LoggerFactory.getLogger(getClass)
 
   object Config {
     def isMaster = sys.env("MASTER").toBoolean
     def slaves = sys.env("SLAVES").split(",").toList
   }
 
-  var value:String = "zero"
-
   def main(args: Array[String]) {
     implicit val system = ActorSystem.create("distkv")
     implicit val mat = ActorMaterializer()
     val http = Http(system)
+
+    var value:String = "zero"
 
     val route = path("db") {
       get {
