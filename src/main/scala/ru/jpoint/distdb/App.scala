@@ -35,9 +35,9 @@ object App {
       } ~ post {
         entity(as[String]) { data =>
           complete {
+            log.info(s"write, before=$value, after=$data")
+            value = data
             if (Config.isMaster) {
-              log.info(s"write, before=$value, after=$data")
-              value = data
               log.info(s"replicating write to slaves: ${Config.slaves}")
               Config.slaves.foreach( host =>
                 http.singleRequest(HttpRequest(
@@ -45,10 +45,8 @@ object App {
                   method = HttpMethods.POST,
                   entity = HttpEntity(data))))
 
-              HttpResponse(StatusCodes.OK)
-            } else {
-              HttpResponse(StatusCodes.BadRequest)
             }
+            HttpResponse(StatusCodes.OK)
           }
         }
       }
