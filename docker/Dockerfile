@@ -14,7 +14,7 @@ RUN chmod 600 /root/.ssh/authorized_keys
 RUN rm -f /etc/service/sshd/down
 RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 
-RUN apt-get -y -q install curl iptables iputils-ping inetutils-telnet
+RUN apt-get -y -q install curl iptables iputils-ping inetutils-telnet dnsutils
 EXPOSE 8000
 RUN mkdir /app
 RUN mkdir /etc/service/distkv

@@ -11,10 +11,15 @@ import scala.concurrent.duration._
   * Created by shutty on 11/16/15.
   */
 object Application extends Logging {
+
+  object Config {
+    def isMaster = sys.env("MASTER").toBoolean
+    def slaves = sys.env("SLAVES").split(",").toList
+  }
+
   var value:String = "zero"
 
   def main(args: Array[String]) {
-    val conf = Config.parse(args)
     implicit val system = ActorSystem.create("distkv")
     implicit val mat = ActorMaterializer()
     val http = Http(system)
@@ -30,11 +35,11 @@ object Application extends Logging {
           complete {
             log.info(s"write, before=$value, after=$data")
             value = data
-            if (conf.isMaster) {
-              log.info(s"replicating write to slaves: ${conf.slaves}")
-              conf.slaves.foreach( host =>
+            if (Config.isMaster) {
+              log.info(s"replicating write to slaves: ${Config.slaves}")
+              Config.slaves.foreach( host =>
                 http.singleRequest(HttpRequest(
-                  uri = s"http://$host/db",
+                  uri = s"http://$host:8000/db",
                   method = HttpMethods.POST,
                   entity = HttpEntity(data))))
 
