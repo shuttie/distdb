@@ -8,6 +8,5 @@
         (:results (jepsen/run! (assoc (jepsen.distdb/distsb-test)
                                  :ssh {
                                        :strict-host-key-checking false
-                                       :trace true
                                        :private-key-path "~/.ssh/grebennikov_roman.pem"
                                        :username "root"}))))))

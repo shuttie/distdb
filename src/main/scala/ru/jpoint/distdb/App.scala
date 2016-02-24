@@ -12,48 +12,9 @@ import scala.concurrent.duration._
   * Created by shutty on 11/16/15.
   */
 object App {
-  lazy val log = LoggerFactory.getLogger(getClass)
 
-  object Config {
-    def isMaster = sys.env("MASTER").toBoolean
-    def slaves = sys.env("SLAVES").split(",").toList
-  }
-
-  def main(args: Array[String]) {
-    implicit val system = ActorSystem.create("distkv")
-    implicit val mat = ActorMaterializer()
-    val http = Http(system)
-
-    var value:String = "0"
-
-    val route = path("db") {
-      get {
-        complete {
-          log.info(s"read, result=$value")
-          value
-        }
-      } ~ post {
-        entity(as[String]) { data =>
-          complete {
-            log.info(s"write, before=$value, after=$data")
-            value = data
-            if (Config.isMaster) {
-              log.info(s"replicating write to slaves: ${Config.slaves}")
-              Config.slaves.foreach( host =>
-                http.singleRequest(HttpRequest(
-                  uri = s"http://$host:8000/db",
-                  method = HttpMethods.POST,
-                  entity = HttpEntity(data))))
-
-            }
-            HttpResponse(StatusCodes.OK)
-          }
-        }
-      }
-    }
-
-    Http().bindAndHandle(route, "0.0.0.0", 8000)
-    log.info("Service started")
-    Await.result(system.whenTerminated, Duration.Inf)
+  def main(args: Array[String]): Unit = {
+    val dsys = new MasterSlaveAsync()
+    dsys.start
   }
 }
