@@ -20,21 +20,21 @@ class Quorum extends RestfulServer {
       .headOption)
 
   def buildResponse(quorumResponse:Option[(String, Int)]) = quorumResponse match {
-    case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize-1 =>
-      log.info(s"quorum: $quorumValue with $numberVotes votes")
+    case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize =>
+      log.info(s"quorum: $quorumValue with $numberVotes votes (of $quorumSize)")
       HttpResponse(StatusCodes.OK, entity = quorumValue)
     case other =>
       HttpResponse(StatusCodes.Conflict, entity = s"quorum response: $other")
   }
 
   def read =
-    Future.sequence(slaves.map(node => httpRead(node)))
+    Future.sequence(nodes.map(node => httpRead(node)))
       .flatMap(handleQuorum)
       .map(buildResponse)
 
   def write(data: String) = {
     value = data
-    Future.sequence(slaves.map(node => httpWrite(node, data)))
+    Future.sequence(nodes.map(node => httpWrite(node, data)))
       .flatMap(handleQuorum)
       .map(buildResponse)
   }
