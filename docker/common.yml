@@ -4,5 +4,4 @@ node:
   dns: 172.17.0.1
   privileged: true
   environment:
-    MASTER: 'false'
-    SLAVES: n2,n3,n4,n5
+    NODES: n1,n2,n3,n4,n5

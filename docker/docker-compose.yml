@@ -3,7 +3,6 @@ n1:
   hostname: n1
   environment:
     - DNSDOCK_ALIAS=n1
-    - MASTER=true
   extends:
     file: common.yml
     service: node

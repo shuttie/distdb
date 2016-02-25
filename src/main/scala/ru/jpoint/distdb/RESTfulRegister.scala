@@ -18,6 +18,12 @@ trait RESTfulRegister {
   implicit val mat = ActorMaterializer()
   val http = Http(system)
 
+  def httpWrite(slave:String, data:String) =
+    http.singleRequest(HttpRequest(
+      uri = s"http://$slave:8000/db",
+      method = HttpMethods.POST,
+      entity = HttpEntity(data)))
+
   def read:Future[HttpResponse]
   def write(value:String):Future[HttpResponse]
 

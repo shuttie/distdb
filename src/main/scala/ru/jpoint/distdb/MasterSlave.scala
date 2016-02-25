@@ -8,13 +8,12 @@ import scala.concurrent.Future
   */
 class MasterSlave extends RESTfulRegister {
   var value:String = "0"
-  def slaves = sys.env("SLAVES").split(",").toList.filter(_.nonEmpty)
-
-  def httpWrite(slave:String, data:String) =
-    http.singleRequest(HttpRequest(
-      uri = s"http://$slave:8000/db",
-      method = HttpMethods.POST,
-      entity = HttpEntity(data)))
+  val hostname = sys.env("HOSTNAME")
+  val slaves = sys.env("NODES")
+    .split(",")
+    .toList
+    .filter(_.nonEmpty)
+    .filterNot(_ == hostname)
 
   def read = {
     log.info(s"read, result=$value")
