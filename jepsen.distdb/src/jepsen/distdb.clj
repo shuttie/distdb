@@ -31,8 +31,16 @@
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
 (defn w [_ _] {:type :invoke, :f :write, :value (rand-int 5)})
 
-(defn http-write [host value] (http/post (join ["http://" host ":8000/db"])  {:body value}))
-(defn http-read [host] (read-string (:body (http/get (join ["http://" host ":8000/db"])))))
+(defn process-response [response op]
+  (case (:status response)
+    200 (assoc op :type :ok :value (read-string (:body response)))
+    409 (assoc op :type :fail)))
+
+(defn http-write [host op]
+  (process-response (http/post (join ["http://" host ":8000/db"])  { :body (str (:value op))  :throw-exceptions false }) op))
+
+(defn http-read [host op]
+  (process-response (http/get (join ["http://" host ":8000/db"])  { :throw-exceptions false }) op))
 
 (defn client
   "A simple http client"
@@ -45,13 +53,8 @@
                       :type :info,
                       :error :timeout)
                (case (:f op)
-                 :read (assoc op
-                         :type :ok,
-                         :value (http-read host))
-                 :write (do (http-write "n1" (str (:value op)))
-                            (assoc op :type :ok))
-
-                 )))
+                 :read (http-read host op)
+                 :write (http-write host op))))
     (teardown! [_ test]))
   )
 
@@ -75,4 +78,4 @@
     :generator (->> (gen/mix [r w])
                     (gen/stagger 0.1)
                     (gen/clients)
-                    (gen/time-limit 3))))
+                    (gen/time-limit 5))))
