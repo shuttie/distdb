@@ -33,7 +33,6 @@ class Quorum extends RestfulServer {
       .map(buildResponse)
 
   def write(data: String) = {
-    value = data
     Future.sequence(nodes.map(node => httpWrite(node, data)))
       .flatMap(handleQuorum)
       .map(buildResponse)
