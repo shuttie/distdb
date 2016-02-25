@@ -78,4 +78,8 @@
     :generator (->> (gen/mix [r w])
                     (gen/stagger 0.1)
                     (gen/clients)
-                    (gen/time-limit 5))))
+                    (gen/time-limit 5))
+    :ssh {
+          :strict-host-key-checking false
+          :private-key-path "~/.ssh/grebennikov_roman.pem"
+          :username "root"}))
