@@ -1,9 +1,6 @@
 package ru.jpoint.distdb
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-
 import scala.concurrent.Future
 
 /**
