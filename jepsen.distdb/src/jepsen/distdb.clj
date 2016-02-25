@@ -31,6 +31,9 @@
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
 (defn w [_ _] {:type :invoke, :f :write, :value (rand-int 5)})
 
+(defn http-write [host value] (http/post (join ["http://" host ":8000/db"])  {:body value}))
+(defn http-read [host] (read-string (:body (http/get (join ["http://" host ":8000/db"])))))
+
 (defn client
   "A simple http client"
   [host]
@@ -44,9 +47,9 @@
                (case (:f op)
                  :read (assoc op
                          :type :ok,
-                         :value (read-string (:body (http/get (join ["http://" host ":8000/db"])))))
-                 :write (do (http/post "http://n1:8000/db" {:body (str (:value op))})
-                                   (assoc op :type :ok))
+                         :value (http-read host))
+                 :write (do (http-write "n1" (str (:value op)))
+                            (assoc op :type :ok))
 
                  )))
     (teardown! [_ test]))
@@ -62,14 +65,14 @@
 
 (defn distsb-test
   []
-    (assoc tests/noop-test
-      :name "distdb"
-      :os ubuntu/os
-      :db (db "1.0")
-      :client (client nil)
-      :checker distdb-checker
-      :model (model/register 5)
-      :generator (->> (gen/mix [r w])
-                      (gen/stagger 0.1)
-                      (gen/clients)
-                      (gen/time-limit 10))))
+  (assoc tests/noop-test
+    :name "distdb"
+    :os ubuntu/os
+    :db (db "1.0")
+    :client (client nil)
+    :checker distdb-checker
+    :model (model/register 5)
+    :generator (->> (gen/mix [r w])
+                    (gen/stagger 0.1)
+                    (gen/clients)
+                    (gen/time-limit 3))))

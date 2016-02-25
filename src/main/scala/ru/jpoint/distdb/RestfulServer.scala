@@ -14,12 +14,19 @@ trait RestfulServer extends HttpUtils {
   def read: Future[HttpResponse]
   def write(value: String): Future[HttpResponse]
 
+  def commit(data:String) = {
+    value = data
+    log.info(s"committed: $data")
+    HttpResponse(StatusCodes.OK, entity = value)
+  }
+
   var value:String = "0"
   val hostname = sys.env("HOSTNAME")
   val nodes = sys.env("NODES")
     .split(",")
     .toList
     .filter(_.nonEmpty)
+  val slaves = nodes.filter(_ != hostname)
 
   def start = {
 
@@ -32,6 +39,21 @@ trait RestfulServer extends HttpUtils {
         entity(as[String]) { data =>
           complete {
             write(data)
+          }
+        }
+      }
+    } ~ path("local") {
+      get {
+        complete {
+          log.info(s"local read: $value")
+          HttpResponse(StatusCodes.OK, entity = value)
+        }
+      } ~ post {
+        entity(as[String]) { data =>
+          complete {
+            value = data
+            log.info(s"local commit: $data")
+            HttpResponse(StatusCodes.OK, entity = value)
           }
         }
       }
