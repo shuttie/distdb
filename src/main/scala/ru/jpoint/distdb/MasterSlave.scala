@@ -16,7 +16,7 @@ class MasterSlave extends RESTfulRegister {
     log.info(s"write, before=$value, after=$data")
     value = data
     log.info(s"replicating write to slaves: $nodes")
-    nodes.foreach(slave => httpWrite(slave, data))
+    nodes.foreach(node => httpWrite(node, data))
     Future.successful(HttpResponse(StatusCodes.OK))
   }
 

@@ -15,7 +15,7 @@ class MasterSlaveAsync extends MasterSlave {
 
     log.info(s"replicating write to slaves: $nodes")
     Future.sequence(nodes
-      .map(slave => httpWrite(slave, data)))
+      .map(node => httpWrite(node, data)))
       .map(responses => responses
           .find(_.status != StatusCodes.OK)
           .getOrElse(HttpResponse(StatusCodes.OK)))
