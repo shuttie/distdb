@@ -14,10 +14,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by shutty on 2/18/16.
   */
-trait RESTfulRegister {
+trait HttpRegister {
 
-  def read:Future[HttpResponse]
-  def write(value:String):Future[HttpResponse]
+  def read: Future[HttpResponse]
+  def write(value: String): Future[HttpResponse]
 
   lazy val log = LoggerFactory.getLogger(getClass)
   implicit val system = ActorSystem.create("distdb")
@@ -32,15 +32,16 @@ trait RESTfulRegister {
     .filter(_.nonEmpty)
     .filterNot(_ == hostname)
 
-  def httpWrite(slave:String, data:String) =
+  def httpWrite(node:String, data:String) =
     http.singleRequest(HttpRequest(
-      uri = s"http://$slave:8000/db",
+      uri = s"http://$node:8000/db",
       method = HttpMethods.POST,
       entity = HttpEntity(data)))
 
-  def httpRead(slave:String) = http
-      .singleRequest(HttpRequest(
-        uri = s"http://$slave:8000/db",
+  def httpRead(node:String) =
+    http.singleRequest(
+      HttpRequest(
+        uri = s"http://$node:8000/db",
         method = HttpMethods.GET))
       .flatMap(response => response.entity.dataBytes.runFold(ByteString(""))(_ ++ _)) // wtf?
       .map(_.utf8String)

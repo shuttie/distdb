@@ -6,7 +6,7 @@ import scala.concurrent.Future
 /**
   * Created by shutty on 2/18/16.
   */
-class MasterSlave extends RESTfulRegister {
+class MasterSlave extends HttpRegister {
   def read = {
     log.info(s"read, result=$value")
     Future.successful(HttpResponse(StatusCodes.OK, entity = HttpEntity(value)))
