@@ -38,13 +38,12 @@ trait RESTfulRegister {
       method = HttpMethods.POST,
       entity = HttpEntity(data)))
 
-  def httpRead(slave:String) =
-  http.singleRequest(HttpRequest(
-    uri = s"http://$slave:8000/db",
-    method = HttpMethods.GET
-  ))
-    .flatMap(response => response.entity.dataBytes.runFold(ByteString(""))(_ ++ _))
-    .map(_.utf8String)
+  def httpRead(slave:String) = http
+      .singleRequest(HttpRequest(
+        uri = s"http://$slave:8000/db",
+        method = HttpMethods.GET))
+      .flatMap(response => response.entity.dataBytes.runFold(ByteString(""))(_ ++ _)) // wtf?
+      .map(_.utf8String)
 
   def start = {
 
