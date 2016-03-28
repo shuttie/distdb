@@ -5,7 +5,7 @@ package ru.jpoint.distdb
   */
 object Server {
   def main(args: Array[String]): Unit = {
-    val dsys = new MasterSlave()
+    val dsys = new Quorum()
     dsys.start
   }
 }

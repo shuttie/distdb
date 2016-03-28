@@ -10,17 +10,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by shutty on 2/18/16.
   */
 trait RestfulServer extends HttpUtils {
-
   def read: Future[HttpResponse]
   def write(value: String): Future[HttpResponse]
 
-  def commit(data:String) = {
-    value = data
-    log.info(s"committed: $data")
-    HttpResponse(StatusCodes.OK, entity = value)
-  }
-
-  var value:String = "0"
+  var storedValue: String = "0"
   val hostname = sys.env("HOSTNAME")
   val nodes = sys.env("NODES")
     .split(",")
@@ -45,15 +38,15 @@ trait RestfulServer extends HttpUtils {
     } ~ path("local") {
       get {
         complete {
-          log.info(s"local read: $value")
-          HttpResponse(StatusCodes.OK, entity = value)
+          log.info(s"local read: $storedValue")
+          HttpResponse(StatusCodes.OK, entity = storedValue)
         }
       } ~ post {
         entity(as[String]) { data =>
           complete {
-            value = data
+            storedValue = data
             log.info(s"local commit: $data")
-            HttpResponse(StatusCodes.OK, entity = value)
+            HttpResponse(StatusCodes.OK, entity = storedValue)
           }
         }
       }
@@ -63,4 +56,5 @@ trait RestfulServer extends HttpUtils {
     log.info("Service started")
     Await.result(system.whenTerminated, Duration.Inf)
   }
+
 }

@@ -9,17 +9,17 @@ import scala.concurrent.Future
   * Not really working, but compiles :)
   */
 class Quorum extends RestfulServer {
-  def quorumSize = Math.ceil(slaves.size / 2.0)
+  def quorumSize = Math.ceil(nodes.size / 2.0)
 
-  def handleQuorum(responses:List[HttpResponse]) =
+  def handleQuorum(responses: List[HttpResponse]) =
     Future.sequence(responses.map(parseResponse)).map(_
       .groupBy(x => x)
       .toList
       .map(item => item._1 -> item._2.size)
       .sortBy(_._2)
-      .headOption)
+      .lastOption)
 
-  def buildResponse(quorumResponse:Option[(String, Int)]) = quorumResponse match {
+  def buildResponse(quorumResponse: Option[(String, Int)]) = quorumResponse match {
     case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize =>
       log.info(s"quorum: $quorumValue with $numberVotes votes (of $quorumSize)")
       HttpResponse(StatusCodes.OK, entity = quorumValue)
@@ -37,4 +37,5 @@ class Quorum extends RestfulServer {
       .flatMap(handleQuorum)
       .map(buildResponse)
   }
+
 }

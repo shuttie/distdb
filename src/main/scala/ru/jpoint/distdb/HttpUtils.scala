@@ -17,22 +17,30 @@ trait HttpUtils {
   implicit val mat = ActorMaterializer()
   val http = Http(system)
 
-  def httpWrite(node:String, data:String) =
+  def httpWrite(node: String, data: String) =
     http.singleRequest(HttpRequest(
       uri = s"http://$node:8000/local",
       method = HttpMethods.POST,
       entity = data))
 
-  def httpRead(node:String) =
+  def httpRead(node: String) =
     http.singleRequest(
       HttpRequest(
         uri = s"http://$node:8000/local",
         method = HttpMethods.GET))
 
-  def parseResponse(response:HttpResponse) = response
+  def parseResponse(response: HttpResponse) = response
     .entity
     .dataBytes
     .runFold(ByteString(""))(_ ++ _)
     .map(_.utf8String)
 
 }
+
+
+
+
+
+
+
+
