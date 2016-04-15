@@ -1,9 +1,11 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d [%-5level] - %msg%n</pattern>
+            <pattern>%d [%-5level] - %logger: %msg%n</pattern>
         </encoder>
     </appender>
+    <logger name="io.atomix" level="INFO"/>
+    <logger name="io.netty" level="INFO"/>
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
     </root>

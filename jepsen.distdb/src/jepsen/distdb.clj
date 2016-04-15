@@ -56,7 +56,6 @@
                  :read (http-read host op)
                  :write (http-write host op))))
     (teardown! [_ test]))
-  jep
   )
 
 (def distdb-checker

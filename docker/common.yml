@@ -1,7 +1,8 @@
-node:
-  image: shutty/distdb
-  log_driver: syslog
-  dns: 172.17.0.1
-  privileged: true
-  environment:
-    NODES: n1,n2,n3,n4,n5
+version: '2'
+services:
+  node:
+    image: shutty/distdb
+    dns: 172.18.0.1
+    privileged: true
+    environment:
+      NODES: "n1,n2,n3,n4,n5"

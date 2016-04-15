@@ -1,13 +1,8 @@
 package ru.jpoint.distdb
 
 import akka.http.scaladsl.model.{StatusCodes, HttpResponse}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
-  * Created by shutty on 2/25/16.
-  * Not really working, but compiles :)
-  */
 class Quorum extends RestfulServer {
   def quorumSize = Math.ceil(nodes.size / 2.0)
 
@@ -17,7 +12,7 @@ class Quorum extends RestfulServer {
       .toList
       .map(item => item._1 -> item._2.size)
       .sortBy(_._2)
-      .lastOption)
+      .headOption)
 
   def buildResponse(quorumResponse: Option[(String, Int)]) = quorumResponse match {
     case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize =>
@@ -26,6 +21,7 @@ class Quorum extends RestfulServer {
     case other =>
       HttpResponse(StatusCodes.Conflict, entity = s"quorum response: $other")
   }
+
 
   def read =
     Future.sequence(nodes.map(node => httpRead(node)))

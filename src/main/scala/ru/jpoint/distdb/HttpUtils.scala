@@ -6,14 +6,11 @@ import akka.http.scaladsl.model.{HttpResponse, HttpMethods, HttpRequest}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import org.slf4j.LoggerFactory
-import scala.concurrent.ExecutionContext.Implicits.global
 
-/**
-  * Created by shutty on 2/25/16.
-  */
 trait HttpUtils {
   lazy val log = LoggerFactory.getLogger(getClass)
   implicit val system = ActorSystem.create("distdb")
+  implicit val executor = system.dispatcher
   implicit val mat = ActorMaterializer()
   val http = Http(system)
 

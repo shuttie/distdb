@@ -4,22 +4,19 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
-/**
-  * Created by shutty on 2/18/16.
-  */
 trait RestfulServer extends HttpUtils {
-  def read: Future[HttpResponse]
-  def write(value: String): Future[HttpResponse]
-
-  var storedValue: String = "0"
+  var value: String = "0"
   val hostname = sys.env("HOSTNAME")
   val nodes = sys.env("NODES")
     .split(",")
     .toList
     .filter(_.nonEmpty)
   val slaves = nodes.filter(_ != hostname)
+
+  def read: Future[HttpResponse]
+
+  def write(value: String): Future[HttpResponse]
 
   def start = {
 
@@ -38,15 +35,15 @@ trait RestfulServer extends HttpUtils {
     } ~ path("local") {
       get {
         complete {
-          log.info(s"local read: $storedValue")
-          HttpResponse(StatusCodes.OK, entity = storedValue)
+          log.info(s"local read: $value")
+          HttpResponse(StatusCodes.OK, entity = value)
         }
       } ~ post {
         entity(as[String]) { data =>
           complete {
-            storedValue = data
+            value = data
             log.info(s"local commit: $data")
-            HttpResponse(StatusCodes.OK, entity = storedValue)
+            HttpResponse(StatusCodes.OK, entity = value)
           }
         }
       }
