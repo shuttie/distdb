@@ -55,8 +55,8 @@
                (case (:f op)
                  :read (http-read host op)
                  :write (http-write host op))))
-    (teardown! [_ test]))
-  )
+    (teardown! [_ test])))
+
 (def distdb-checker
   (reify checker/Checker
     (check [this test model history opts]
