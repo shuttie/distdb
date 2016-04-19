@@ -1,4 +1,4 @@
-package ru.jpoint.distdb.quorum
+package ru.jpoint.distdb.raft
 
 import java.io.File
 import java.util.function.Supplier
@@ -20,14 +20,11 @@ class RegisterStateMachine extends StateMachine {
   def put(commit:Commit[SetCommand]) = try { value = commit.operation().value } finally { commit.close() }
   def get(commit:Commit[GetQuery]) = try { value } finally { commit.close() }
 }
-class RSMSupplier extends Supplier[StateMachine] {
-  def get = new RegisterStateMachine()
-}
 
 class RaftServer(hostname:String) {
   val address = new Address(hostname, 5000)
   val server = CopycatServer.builder(address)
-    .withStateMachine(new RSMSupplier())
+    .withStateMachine(new Supplier[StateMachine] { def get = new RegisterStateMachine })
     .withTransport(NettyTransport.builder().build())
     .withStorage(Storage.builder().withDirectory(new File("logs")).withStorageLevel(StorageLevel.DISK).build())
     .build()

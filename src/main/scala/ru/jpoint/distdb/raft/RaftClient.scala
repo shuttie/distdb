@@ -1,4 +1,4 @@
-package ru.jpoint.distdb.quorum
+package ru.jpoint.distdb.raft
 
 import io.atomix.catalyst.transport.{Address, NettyTransport}
 import io.atomix.copycat.client.CopycatClient

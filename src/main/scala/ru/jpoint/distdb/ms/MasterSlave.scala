@@ -1,6 +1,8 @@
-package ru.jpoint.distdb
+package ru.jpoint.distdb.ms
 
 import akka.http.scaladsl.model._
+import ru.jpoint.distdb.RestfulServer
+
 import scala.concurrent.Future
 
 /**

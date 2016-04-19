@@ -1,4 +1,4 @@
-package ru.jpoint.distdb.quorum
+package ru.jpoint.distdb.raft
 
 import java.io.File
 import java.util.function.Supplier

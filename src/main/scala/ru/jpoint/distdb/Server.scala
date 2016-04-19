@@ -1,6 +1,6 @@
 package ru.jpoint.distdb
 
-import ru.jpoint.distdb.quorum.RaftQuorum
+import ru.jpoint.distdb.raft.RaftQuorum
 
 /**
   * Created by shutty on 11/16/15.
