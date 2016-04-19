@@ -12,7 +12,7 @@ class Quorum extends RestfulServer {
       .toList
       .map(item => item._1 -> item._2.size)
       .sortBy(_._2)
-      .headOption)
+      .lastOption)
 
   def buildResponse(quorumResponse: Option[(String, Int)]) = quorumResponse match {
     case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize =>
