@@ -16,7 +16,7 @@ class Quorum extends RestfulServer {
 
   def buildResponse(quorumResponse: Option[(String, Int)]) = quorumResponse match {
     case Some((quorumValue, numberVotes)) if numberVotes >= quorumSize =>
-      log.info(s"quorum: $quorumValue with $numberVotes votes (of $quorumSize)")
+      logger.info(s"quorum: $quorumValue with $numberVotes votes (of $quorumSize)")
       HttpResponse(StatusCodes.OK, entity = quorumValue)
     case other =>
       HttpResponse(StatusCodes.Conflict, entity = s"quorum response: $other")

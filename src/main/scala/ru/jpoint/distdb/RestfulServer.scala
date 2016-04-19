@@ -35,14 +35,14 @@ trait RestfulServer extends HttpUtils {
     } ~ path("local") {
       get {
         complete {
-          log.info(s"local read: $value")
+          logger.info(s"local read: $value")
           HttpResponse(StatusCodes.OK, entity = value)
         }
       } ~ post {
         entity(as[String]) { data =>
           complete {
             value = data
-            log.info(s"local commit: $data")
+            logger.info(s"local commit: $data")
             HttpResponse(StatusCodes.OK, entity = value)
           }
         }
@@ -50,7 +50,7 @@ trait RestfulServer extends HttpUtils {
     }
 
     http.bindAndHandle(route, "0.0.0.0", 8000)
-    log.info("Service started")
+    logger.info("Service started")
     Await.result(system.whenTerminated, Duration.Inf)
   }
 

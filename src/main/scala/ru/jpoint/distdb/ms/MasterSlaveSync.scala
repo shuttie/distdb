@@ -9,10 +9,10 @@ import scala.concurrent.Future
   */
 class MasterSlaveSync extends MasterSlave {
   override def write(data: String) = {
-    log.info(s"write, before=$value, after=$data")
+    logger.info(s"write, before=$value, after=$data")
     value = data
 
-    log.info(s"replicating write to slaves: $slaves")
+    logger.info(s"replicating write to slaves: $slaves")
     Future.sequence(slaves
       .map(node => httpWrite(node, data)))
       .map(responses => responses

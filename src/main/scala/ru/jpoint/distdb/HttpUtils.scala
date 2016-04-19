@@ -2,13 +2,13 @@ package ru.jpoint.distdb
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpResponse, HttpMethods, HttpRequest}
+import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
+import com.typesafe.scalalogging.LazyLogging
 import org.slf4j.LoggerFactory
 
-trait HttpUtils {
-  lazy val log = LoggerFactory.getLogger(getClass)
+trait HttpUtils extends LazyLogging {
   implicit val system = ActorSystem.create("distdb")
   implicit val executor = system.dispatcher
   implicit val mat = ActorMaterializer()
