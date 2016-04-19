@@ -57,10 +57,9 @@
                  :write (http-write host op))))
     (teardown! [_ test]))
   )
-
 (def distdb-checker
   (reify checker/Checker
-    (check [this test model history]
+    (check [this test model history opts]
       (let [a (linear/analysis model history)]
         (assoc a
           :final-paths (take 100 (:final-paths a))
@@ -76,7 +75,7 @@
     :checker distdb-checker
     :model (model/register 5)
     :generator (->> (gen/mix [r w])
-                    (gen/stagger 0.001)
+                    (gen/stagger 0.01)
                     (gen/clients)
                     (gen/time-limit 30))
     :ssh {
