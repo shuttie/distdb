@@ -24,9 +24,9 @@
     (setup! [_ test node]
       (log/info node "setting up distdb" version))
     (teardown! [_ test node]
-      (log/info node "tearing down distdb"))
-    )
-  )
+      (log/info node "tearing down distdb"))))
+
+
 
 (defn r [_ _] {:type :invoke, :f :read, :value nil})
 (defn w [_ _] {:type :invoke, :f :write, :value (rand-int 5)})
@@ -54,7 +54,7 @@
                       :error :timeout)
                (case (:f op)
                  :read (http-read host op)
-                 :write (http-write host op))))
+                 :write (http-write "n1" op))))
     (teardown! [_ test])))
 
 (def distdb-checker
