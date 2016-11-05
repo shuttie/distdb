@@ -1,7 +1,7 @@
 name := "distdb"
 version := "1.0"
 scalaVersion := "2.11.8"
-mainClass in assembly := Some("ru.jpoint.distdb.Server")
+mainClass in assembly := Some("ru.highload.distdb.Server")
 scalacOptions += "-Xexperimental"
 
 resolvers += "kender" at "http://dl.bintray.com/kender/maven"
