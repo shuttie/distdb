@@ -1,4 +1,4 @@
-package ru.jpoint.distdb;
+package ru.highload.distdb;
 
 /**
  * Created by shutty on 2/25/16.

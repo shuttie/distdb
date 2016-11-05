@@ -1,4 +1,4 @@
-package ru.jpoint.distdb.ms
+package ru.highload.distdb.ms
 
 import akka.http.scaladsl.model._
 

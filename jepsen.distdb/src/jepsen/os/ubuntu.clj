@@ -106,10 +106,10 @@
 (def os
   (reify os/OS
     (setup! [_ test node]
-      (info node "setting up ubuntu")
+      (info node "setting up ubuntu"))
 
       ;(meh (net/heal))
       ;(net/heal)
-      )
+
 
     (teardown! [_ test node])))

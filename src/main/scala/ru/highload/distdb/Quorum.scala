@@ -1,4 +1,4 @@
-package ru.jpoint.distdb
+package ru.highload.distdb
 
 import akka.http.scaladsl.model.{StatusCodes, HttpResponse}
 import scala.concurrent.Future
