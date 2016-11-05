@@ -54,7 +54,7 @@
                       :error :timeout)
                (case (:f op)
                  :read (http-read host op)
-                 :write (http-write "n1" op))))
+                 :write (http-write host op))))
     (teardown! [_ test])))
 
 (def distdb-checker
@@ -73,7 +73,7 @@
     :db (db "1.0")
     :client (client nil)
     :checker distdb-checker
-    :model (model/register 5)
+    :model (model/register)
     :generator (->> (gen/mix [r w])
                     (gen/stagger 0.01)
                     (gen/clients)
